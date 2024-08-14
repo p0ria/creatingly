@@ -1,0 +1,8 @@
+<div class="absolute outline-dashed outline-blue-400 inset-0">
+  @for(placement of PLACEMENTS; track $index) {
+  <app-resizable-corner
+    [placement]="placement"
+    ($resize)="$resize.next({ x: $event.x, y: $event.y, placement: placement })"
+  />
+  }
+</div>

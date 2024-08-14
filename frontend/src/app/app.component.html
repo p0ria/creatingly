@@ -1,0 +1,5 @@
+<div class="w-screen h-screen flex items-center justify-center">
+  @for(el of uiElements$ | async; track el.id) {
+  <div [id]="el.id" resizable [ngStyle]="el.style"></div>
+  }
+</div>

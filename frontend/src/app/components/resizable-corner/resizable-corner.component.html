@@ -1,0 +1,16 @@
+<div
+  #corner
+  class="absolute w-3 h-3 border-2 border-blue-400 rounded-full bg-white"
+  [class.-left-1.5]="placement.h == 'left'"
+  [class.-right-1.5]="placement.h == 'right'"
+  [class.-top-1.5]="placement.v == 'top'"
+  [class.-bottom-1.5]="placement.v == 'bottom'"
+  [class.cursor-nwse-resize]="
+    (placement.h == 'left' && placement.v == 'top') ||
+    (placement.h == 'right' && placement.v == 'bottom')
+  "
+  [class.cursor-nesw-resize]="
+    (placement.h == 'left' && placement.v == 'bottom') ||
+    (placement.h == 'right' && placement.v == 'top')
+  "
+></div>
