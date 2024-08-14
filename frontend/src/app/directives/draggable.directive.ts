@@ -50,8 +50,15 @@ export class DraggableDirective implements AfterViewInit, OnDestroy {
           this.el.nativeElement.getBoundingClientRect();
         const diffX = e.clientX - this.dragStart.x;
         const diffY = e.clientY - this.dragStart.y;
-        const newLeft = Math.max(0, left + diffX);
-        const newTop = Math.max(0, top + diffY);
+
+        const newLeft = Math.min(
+          Math.max(0, left + diffX),
+          window.innerWidth - width
+        );
+        const newTop = Math.min(
+          Math.max(0, top + diffY),
+          window.innerHeight - height
+        );
 
         this.dragStart = e;
         this.designer.update(this.id, 'style', {

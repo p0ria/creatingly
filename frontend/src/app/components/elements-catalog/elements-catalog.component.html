@@ -1,5 +1,9 @@
 <div class="p-4 flex flex-col gap-6 border-2 shadow-lg">
   @for (shape of SHAPES; track shape.type) {
-  <div [class]="shape.class" (click)="add(shape.type)"></div>
+  <div
+    [attr.testId]="shape.type"
+    [class]="shape.class"
+    (click)="add(shape.type)"
+  ></div>
   }
 </div>
