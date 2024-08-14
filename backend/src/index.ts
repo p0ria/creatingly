@@ -22,6 +22,11 @@ io.on("connection", (socket) => {
     socket.to(doc1).emit(WsEvent.ElChanged, el);
     designer.update(el);
   });
+
+  socket.on(WsEvent.NewEl, (el: UiElement) => {
+    socket.to(doc1).emit(WsEvent.NewEl, el);
+    designer.update(el);
+  });
 });
 
 httpServer.listen(3000, () => {

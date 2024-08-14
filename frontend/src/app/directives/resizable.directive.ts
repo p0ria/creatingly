@@ -11,7 +11,7 @@ import {
 import { Subject, takeUntil } from 'rxjs';
 import { Resizable } from '../components/resizable/resizable.component';
 import { DesignerService } from '../services/designer.service';
-import { Placement } from '../types';
+import { Id, Placement } from '../types';
 
 const MIN_GAP = 30;
 
@@ -23,13 +23,15 @@ export class ResizableDirective implements OnInit, OnDestroy {
   el = inject<ElementRef<HTMLDivElement>>(ElementRef);
   renderer = inject(Renderer2);
   vcr = inject(ViewContainerRef);
-  designerService = inject(DesignerService);
+  designer = inject(DesignerService);
+  id: Id;
   destroyed$ = new Subject<void>();
 
   @HostBinding('class')
   class = 'fixed';
 
   ngOnInit(): void {
+    this.id = this.el.nativeElement.id;
     var resizableComponentRef = this.vcr.createComponent(Resizable);
 
     resizableComponentRef.instance.$resize
@@ -51,34 +53,33 @@ export class ResizableDirective implements OnInit, OnDestroy {
     y: number;
     placement: Placement;
   }) {
-    const id = this.el.nativeElement.id;
     const { left, right, top, bottom } =
       this.el.nativeElement.getBoundingClientRect();
 
     if (placement.h == 'left') {
-      const newLeft = Math.min(x, right - MIN_GAP);
+      const newLeft = Math.max(0, Math.min(x, right - MIN_GAP));
       const width = right - newLeft;
-      this.designerService.update(id, 'style', {
+      this.designer.update(this.id, 'style', {
         left: `${newLeft}px`,
         width: `${width}px`,
       });
     } else {
       const width = Math.max(MIN_GAP, x - left);
-      this.designerService.update(id, 'style', {
+      this.designer.update(this.id, 'style', {
         width: `${width}px`,
       });
     }
 
     if (placement.v == 'top') {
-      const newTop = Math.min(y, bottom - MIN_GAP);
+      const newTop = Math.max(0, Math.min(y, bottom - MIN_GAP));
       const height = bottom - newTop;
-      this.designerService.update(id, 'style', {
+      this.designer.update(this.id, 'style', {
         top: `${newTop}px`,
         height: `${height}px`,
       });
     } else {
       const height = Math.max(MIN_GAP, y - top);
-      this.designerService.update(id, 'style', {
+      this.designer.update(this.id, 'style', {
         height: `${height}px`,
       });
     }

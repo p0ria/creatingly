@@ -1,6 +1,7 @@
 export enum WsEvent {
   CurrentState = "CurrentState",
   ElChanged = "ElChanged",
+  NewEl = "NewEl",
 }
 
 export type Id = string;

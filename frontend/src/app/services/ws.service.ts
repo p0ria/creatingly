@@ -13,6 +13,7 @@ export class WsService {
   connected$ = new BehaviorSubject(false);
   elChanged$ = new EventEmitter<UiElement>();
   currentState$ = new EventEmitter<Record<Id, UiElement>>();
+  newEl$ = new EventEmitter<UiElement>();
 
   constructor() {
     this.socket.on('connect', () => {

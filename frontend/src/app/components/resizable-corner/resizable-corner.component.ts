@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { Subject, fromEvent, sampleTime, takeUntil } from 'rxjs';
-import { Placement, ResizeEvent } from '../../types';
+import { Placement, Point } from '../../types';
 
 @Component({
   selector: 'app-resizable-corner',
@@ -20,18 +20,21 @@ import { Placement, ResizeEvent } from '../../types';
 })
 export class ResizableCorner implements OnDestroy {
   @Input() placement: Placement;
-  @Output() $resize = new EventEmitter<ResizeEvent>();
+  @Output() $resize = new EventEmitter<Point>();
 
-  private cornerRef = viewChild<ElementRef<HTMLDivElement>>('corner');
-  private mouseDown$ = new Subject<void>();
+  private mouseUp$ = new Subject<void>();
   destroyed$ = new Subject<void>();
 
   @HostListener('mousedown', ['$event'])
   onMouseDown(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.mouseUp$.next();
+
     fromEvent(document, 'mousemove')
       .pipe(
         sampleTime(50),
-        takeUntil(this.mouseDown$),
+        takeUntil(this.mouseUp$),
         takeUntil(this.destroyed$)
       )
       .subscribe((e: MouseEvent) => {
@@ -39,9 +42,9 @@ export class ResizableCorner implements OnDestroy {
       });
 
     fromEvent(document, 'mouseup')
-      .pipe(takeUntil(this.mouseDown$), takeUntil(this.destroyed$))
+      .pipe(takeUntil(this.mouseUp$), takeUntil(this.destroyed$))
       .subscribe(() => {
-        this.mouseDown$.next();
+        this.mouseUp$.next();
       });
   }
 

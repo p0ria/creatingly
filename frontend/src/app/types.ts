@@ -3,7 +3,7 @@ export type Placement = {
   v: 'top' | 'bottom';
 };
 
-export type ResizeEvent = {
+export type Point = {
   x: number;
   y: number;
 };
@@ -19,4 +19,11 @@ export type UiElement = {
 export enum WsEvent {
   CurrentState = 'CurrentState',
   ElChanged = 'ElChanged',
+  NewEl = 'NewEl',
+}
+
+export enum Shape {
+  Square = 'Square',
+  Rect = 'Rect',
+  Circle = 'Circle',
 }

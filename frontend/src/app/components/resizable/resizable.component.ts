@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { ResizableCorner } from '../resizable-corner/resizable-corner.component';
-import { Placement, ResizeEvent } from '../../types';
+import { Placement, Point } from '../../types';
 
 @Component({
   selector: 'app-resizable',
@@ -13,7 +13,7 @@ export class Resizable {
   @Output() $resize = new EventEmitter<
     {
       placement: Placement;
-    } & ResizeEvent
+    } & Point
   >();
 
   PLACEMENTS: Placement[] = [
