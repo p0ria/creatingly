@@ -2,18 +2,29 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { io } from 'socket.io-client';
 import { environment } from '../../environments/environment';
 import { BehaviorSubject } from 'rxjs';
-import { Id, UiElement, WsEvent } from '../types';
+import {
+  DocsListData,
+  DocStateData,
+  ElChangedData,
+  Id,
+  NewElData,
+  UiElement,
+  WsEvent,
+} from '../types';
 import { lowercaseFirstLetter } from '../common/utils';
 
 @Injectable({
   providedIn: 'root',
 })
 export class WsService {
-  socket = io(environment.wsUrl);
+  socket = io(environment.wsUrl, {
+    protocols: ['websocket'],
+  });
   connected$ = new BehaviorSubject(false);
-  elChanged$ = new EventEmitter<UiElement>();
-  currentState$ = new EventEmitter<Record<Id, UiElement>>();
-  newEl$ = new EventEmitter<UiElement>();
+  docsList$ = new EventEmitter<DocsListData>();
+  docState$ = new EventEmitter<DocStateData>();
+  elChanged$ = new EventEmitter<ElChangedData>();
+  newEl$ = new EventEmitter<NewElData>();
 
   constructor() {
     this.socket.on('connect', () => {
@@ -24,14 +35,16 @@ export class WsService {
       this.connected$.next(false);
     });
 
-    Object.values(WsEvent).forEach((ev) =>
-      this.socket.on(ev, (data) => {
-        this[`${lowercaseFirstLetter(ev)}$`].emit(data);
-      })
-    );
+    Object.values(WsEvent)
+      .filter((ev) => Object.hasOwn(this, `${lowercaseFirstLetter(ev)}$`))
+      .forEach((ev) =>
+        this.socket.on(ev, (data) => {
+          this[`${lowercaseFirstLetter(ev)}$`]?.emit(data);
+        })
+      );
   }
 
-  emit(ev: WsEvent, el: UiElement) {
-    this.socket.emit(ev, el);
+  emit(ev: WsEvent, data: any) {
+    this.socket.emit(ev, data);
   }
 }

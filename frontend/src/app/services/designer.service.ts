@@ -1,38 +1,73 @@
 import { inject, Injectable } from '@angular/core';
 import { nanoid } from 'nanoid';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, filter, skip } from 'rxjs';
 import { getStyleForShape, isObj, now } from '../common/utils';
-import { Id, Shape, UiElement, WsEvent } from '../types';
+import {
+  DocName,
+  DocsListData,
+  DocStateData,
+  ElChangedData,
+  Id,
+  NewElData,
+  Shape,
+  SwitchDocData,
+  UiElement,
+  WsEvent,
+} from '../types';
 import { WsService } from './ws.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DesignerService {
+  docsList$ = new BehaviorSubject<DocName[]>([]);
+  currentDoc$ = new BehaviorSubject<DocName>('');
   state$ = new BehaviorSubject<Record<Id, UiElement>>({});
   private ws = inject(WsService);
 
   constructor() {
-    this.ws.currentState$.subscribe((state) => this.state$.next(state));
+    this.ws.docsList$.subscribe((data: DocsListData) =>
+      this.docsList$.next(data)
+    );
 
-    this.ws.newEl$.subscribe((el) => {
+    this.ws.docState$.subscribe((data: DocStateData) => {
+      this.currentDoc$.next(data.doc);
+      this.state$.next(data.state);
+    });
+
+    this.ws.newEl$.subscribe(({ el }) => {
       this.state$.next({
         ...this.state$.value,
         [el.id]: el,
       });
     });
 
-    this.ws.elChanged$.subscribe((el) => {
-      if (this.state$.value[el.id].updatedAt < el.updatedAt) {
+    this.ws.elChanged$.subscribe(({ el }) => {
+      if (this.state$.value[el.id]?.updatedAt < el.updatedAt) {
         this.state$.next({
           ...this.state$.value,
           [el.id]: el,
         });
       }
     });
+
+    this.docsList$
+      .pipe(
+        skip(1),
+        filter((docs) => !docs?.length)
+      )
+      .subscribe(() => this.currentDoc$.next(''));
   }
 
-  add(shape: Shape) {
+  addDoc(doc: DocName) {
+    this.ws.emit(WsEvent.NewDoc, doc);
+  }
+
+  switchDoc(doc: DocName) {
+    this.ws.emit(WsEvent.SwitchDoc, doc as SwitchDocData);
+  }
+
+  addEl(shape: Shape) {
     const el = {
       id: nanoid(),
       style: getStyleForShape(shape),
@@ -44,10 +79,13 @@ export class DesignerService {
       [el.id]: el,
     });
 
-    this.ws.emit(WsEvent.NewEl, el);
+    this.ws.emit(WsEvent.NewEl, {
+      doc: this.currentDoc$.value,
+      el,
+    } as NewElData);
   }
 
-  update<K extends keyof UiElement | ''>(id: Id, prop: K, update: Update<K>) {
+  updateEl<K extends keyof UiElement | ''>(id: Id, prop: K, update: Update<K>) {
     const updatedAt = now();
     const el = this.state$.value[id];
     const updatedEl =
@@ -73,7 +111,10 @@ export class DesignerService {
       [id]: updatedEl,
     });
 
-    this.ws.emit(WsEvent.ElChanged, updatedEl);
+    this.ws.emit(WsEvent.ElChanged, {
+      doc: this.currentDoc$.value,
+      el: updatedEl,
+    } as ElChangedData);
   }
 }
 

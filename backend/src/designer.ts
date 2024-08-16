@@ -1,16 +1,22 @@
-import { Id, UiElement } from "./types";
+import { DocName, Id, UiElement } from "./types";
 
 export const designer = {
-  state: {} as Record<Id, UiElement>,
-  update(el: UiElement) {
-    this.state = {
-      ...this.state,
+  docs: [] as DocName[],
+  state: {} as Record<DocName, Record<Id, UiElement>>,
+  addDoc(doc: DocName) {
+    if (!this.docs[doc]) {
+      this.docs.push(doc);
+    }
+  },
+  updateEl(doc: DocName, el: UiElement) {
+    this.state[doc] = {
+      ...(this.state[doc] || {}),
       [el.id]: el,
     };
   },
-  add(el: UiElement) {
-    this.state = {
-      ...this.state,
+  addEl(doc: DocName, el: UiElement) {
+    this.state[doc] = {
+      ...(this.state[doc] || {}),
       [el.id]: el,
     };
   },

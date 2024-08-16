@@ -30,6 +30,6 @@ export class ElementsCatalog {
   designer = inject(DesignerService);
 
   add(shape: Shape) {
-    this.designer.add(shape);
+    this.designer.addEl(shape);
   }
 }

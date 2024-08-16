@@ -59,13 +59,13 @@ export class ResizableDirective implements OnInit, OnDestroy {
     if (placement.h == 'left') {
       const newLeft = Math.max(0, Math.min(x, right - MIN_GAP));
       const width = right - newLeft;
-      this.designer.update(this.id, 'style', {
+      this.designer.updateEl(this.id, 'style', {
         left: `${newLeft}px`,
         width: `${width}px`,
       });
     } else {
       const width = Math.max(MIN_GAP, x - left);
-      this.designer.update(this.id, 'style', {
+      this.designer.updateEl(this.id, 'style', {
         width: `${width}px`,
       });
     }
@@ -73,13 +73,13 @@ export class ResizableDirective implements OnInit, OnDestroy {
     if (placement.v == 'top') {
       const newTop = Math.max(0, Math.min(y, bottom - MIN_GAP));
       const height = bottom - newTop;
-      this.designer.update(this.id, 'style', {
+      this.designer.updateEl(this.id, 'style', {
         top: `${newTop}px`,
         height: `${height}px`,
       });
     } else {
       const height = Math.max(MIN_GAP, y - top);
-      this.designer.update(this.id, 'style', {
+      this.designer.updateEl(this.id, 'style', {
         height: `${height}px`,
       });
     }

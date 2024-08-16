@@ -1,0 +1,16 @@
+<div class="w-screen h-screen flex items-center justify-center">
+  @for(el of uiElements$ | async; track el.id) {
+  <div [id]="el.id" resizable draggable [ngStyle]="el.style"></div>
+  } @empty {
+  <div class="relative">
+    <h3 class="w-[360px] text-center text-2xl opacity-60 leading-9">
+      Start adding elements to screen from left menu
+    </h3>
+    <app-arrow-svg />
+  </div>
+  }
+
+  <div class="fixed left-0 top-1/2 -translate-y-1/2">
+    <app-elements-catalog />
+  </div>
+</div>

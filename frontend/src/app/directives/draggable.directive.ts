@@ -61,7 +61,7 @@ export class DraggableDirective implements AfterViewInit, OnDestroy {
         );
 
         this.dragStart = e;
-        this.designer.update(this.id, 'style', {
+        this.designer.updateEl(this.id, 'style', {
           left: `${newLeft}px`,
           top: `${newTop}px`,
         });
